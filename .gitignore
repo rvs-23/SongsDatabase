@@ -1,1 +1,5 @@
 _private_data/
+
+__pycache__/
+
+credits.docx

@@ -11,7 +11,6 @@ import urllib
 import pandas as pd
 from bs4 import BeautifulSoup
 
-
 class ParseYtHistory:
     """
     Class to parse out the necessary information from the history HTML/JSON file.
@@ -38,13 +37,15 @@ class ParseYtHistory:
         returns the HTML file without the "tag"
         """
         return (
-            text[: text.find("<" + tag + ">")]
-            + text[text.find("</" + tag + ">") + len(tag) + 3 :]
+            text[: text.find("<" + tag + ">")] + text[text.find("</" + tag + ">") + len(tag) + 3 :]
         )
 
     @staticmethod
     def getVideoID(link):
         """
+        Source:
+            https://stackoverflow.com/questions/4356538/how-can-i-extract-video-id-from-youtubes-link-in-python
+        
         Examples:
         - http://youtu.be/SA2iWivDJiE
         - http://www.youtube.com/watch?v=_oPAwA_Udwc&feature=feedu
@@ -147,11 +148,10 @@ class ParseYtHistory:
 
         # Check if a video text has 'short' in it. If yes, most likely, it's a YouTube
         # short and can be ignored.
-        is_short = df_video_history["Text"].str.lower().str.contains("short")
+        is_short = df_video_history["Text"].str.lower().str.contains("short|shorts|shot|shots")
         df_video_history = df_video_history[~(is_short)]
         df_video_history.reset_index(inplace=True, drop=True)
 
         return df_video_history
-
 
 ###############################################################################

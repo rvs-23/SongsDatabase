@@ -48,7 +48,7 @@ class FetchVideoDetails:
                 every_video_detail = dict(
                     Video_ID=yt_id,
                     Title=snippet.get("title"),
-                    CategoryId=snippet.get("categoryId"),
+                    CategoryID=snippet.get("categoryId"),
                     PublishDate=snippet.get("publishedAt"),
                     ChannelTitle=snippet.get("channelTitle"),
                     Description=snippet.get("description"),

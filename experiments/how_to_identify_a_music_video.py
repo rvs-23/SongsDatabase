@@ -22,6 +22,7 @@ import os
 import string
 from collections import Counter
 import pandas as pd
+import pickle
 from nltk.corpus import stopwords
 from googleapiclient.discovery import build
 
@@ -30,8 +31,8 @@ from googleapiclient.discovery import build
 # nltk.download('stopwords')
 
 # Opening the API key.
-path = os.path.join(os.path.dirname(__file__), '../_private_data/api_key.txt')
-with open(path, 'r', encoding='utf-8') as f:
+base_path = os.path.dirname(__file__)
+with open(os.path.join(base_path, '../_private_data/api_key.txt'), 'r', encoding='utf-8') as f:
     api_key = f.read()
     
 # Creating a YouTube resource
@@ -98,7 +99,8 @@ df = pd.DataFrame(all_video_details)
 
 # 1. Filtering CategoryID
 # Filtering the top 5 CategoryIDs which YT identifies as music.
-top_categories = df['CategoryID'].value_counts()[:5]
+top_categories = df['CategoryID'].value_counts()[:3]
+print(f"Fetched Top-3 video categories which account for {round(sum(top_categories)/len(df)*100, 2)} % music videos...")
 
 # 2. Filtering Tags
 # The tags column contains a list of tags associated with each video.
@@ -106,8 +108,9 @@ top_categories = df['CategoryID'].value_counts()[:5]
 all_tags = [
     tag.lower() for tags in df['Tags'].tolist() if tags is not None for tag in tags
     ]
-# Fetching the top 1% of the most common tags in music videos.
-top_tags = Counter(all_tags).most_common(int(0.01*len(all_tags)))
+# Fetching the top 0.1% most common tags in music videos.
+top_tags = Counter(all_tags).most_common(int(0.001*len(all_tags)))
+print(f"Fetched {len(top_tags)} most common tags...")
 
 # 3. Filtering Description
 desc_words = ''.join(df['Description'].str.lower()).split()
@@ -117,5 +120,115 @@ desc_words_filtered = [word for word in desc_words if word not in stopwords_en]
 # Fetching the top 0.1% most common words.
 desc_most_common = Counter(desc_words_filtered).most_common(int(0.001*len(desc_words_filtered)))
 desc_most_common = [word for word in desc_most_common if word[0] not in string.punctuation]
+print(f"Fetched {len(desc_most_common)} most common words...")
+
+print("Dumping categories, tags and most common words into pickle...")
+with open(os.path.join(base_path, 'music_identify_data/top_categories.pkl'), 'wb') as cats:
+    pickle.dump(top_categories, cats)
+
+with open(os.path.join(base_path, 'music_identify_data/top_tags.pkl'), 'wb') as tags:
+    pickle.dump(top_tags, tags)
+
+with open(os.path.join(base_path, 'music_identify_data/top_desc_words.pkl'), 'wb') as desc:
+    pickle.dump(desc_most_common, desc)
+
+print("Complete...")
 
 #########################################
+
+# Fetched Top-3 video categories which account for 98.65 % music videos...
+# Fetched 81 most common tags...
+# Fetched 492 most common words...
+# Dumping categories, tags and most common words into pickle...
+# Complete...
+
+# print(top_categories)
+# Out[20]: 
+# 10    4089
+# 24     165
+# 22      49
+# Name: CategoryID, dtype: int64
+
+# print(top_tags)
+# Out[21]: 
+# [('pop', 870),
+#  ('music', 597),
+#  ('music video', 511),
+#  ('official', 495),
+#  ('vevo', 401),
+#  ('video', 373),
+#  ('hip hop', 352),
+#  ('rap', 351),
+#  ('lyrics', 330),
+#  ('official video', 313),
+#  ('records', 311),
+#  ('album', 229),
+#  ('single', 223),
+#  ('dance', 218),
+#  ('official music video', 214),
+#  ('pop music', 213),
+#  ('rock', 212),
+#  ('the', 206),
+#  ('remix', 180),
+#  ('remastered music videos', 179),
+#  ('#remastered', 176),
+#  ('hd music videos', 176),
+#  ('alternative', 166),
+#  ('acoustic', 145),
+#  ('cover', 135),
+#  ('hip', 129),
+#  ('hop', 126),
+#  ('atlantic records', 124),
+#  ('download', 120),
+#  ('warner records', 109),
+#  ('r&b', 106),
+#  ('edm', 105),
+#  ('live', 105),
+#  ('audio', 102),
+#  ('instrumental', 102),
+#  ('karaoke', 100),
+#  ('interscope', 96),
+#  ('new', 94),
+#  ('country', 92),
+#  ('house', 90),
+#  ('you', 89),
+#  ('song', 87),
+#  ('love', 86),
+#  ('drake', 84),
+#  ('vevo music', 77),
+#  ('electronic', 76),
+#  ('wmg', 75),
+#  ('chris brown', 75),
+#  ('trap', 74),
+#  ('sony', 72),
+#  ('ed sheeran', 70),
+#  ('rihanna', 65),
+#  ('eminem', 64),
+#  ('nicki minaj', 64),
+#  ('island', 64),
+#  ('jam', 62),
+#  ('new music', 62),
+#  ('columbia', 61),
+#  ('hq', 59),
+#  ('universal', 57),
+#  ('justin bieber', 56),
+#  ('epic', 56),
+#  ('warner music group (record label)', 56),
+#  ('beyonce', 55),
+#  ('dance music', 54),
+#  ('def', 53),
+#  ('official audio', 52),
+#  ('indie', 51),
+#  ('country music', 51),
+#  ('english songs', 49),
+#  ('songs', 49),
+#  ('maroon 5', 49),
+#  ('selena gomez', 49),
+#  ('music (tv genre)', 49),
+#  ('soundtrack', 49),
+#  ('summer', 48),
+#  ('marshmello', 48),
+#  ('money', 48),
+#  ('tiktok', 48),
+#  ('new years eve', 47),
+#  ('sheeran', 46)]

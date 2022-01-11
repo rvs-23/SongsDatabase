@@ -14,7 +14,6 @@ from module_identify_music_video_3 import IdentifyMusicVideo
 
 history_file_path = os.path.join(base_path, '../_private_data/watch-history.json')
 api_key_path = os.path.join(base_path, '../_private_data/api_key.txt')
-watched_urls_path = os.path.join(base_path, '../_private_data/WatchedURLs.csv')
 
 def open_files(history_file_path, api_key_path, is_json=True):    
     with open(api_key_path, 'r') as file:
@@ -36,9 +35,10 @@ if os.path.isfile(complete_file_path):
     df_complete_history_details = pd.read_csv(complete_file_path)
     
 else:
-    
+    print("Opening the file with just history...")
     history, api_key = open_files(history_file_path, api_key_path, is_json=True)
     
+    watched_urls_path = os.path.join(base_path, '../_private_data/WatchedURLs.csv')
     # Check if we have already created a CSV of all the watched URLs
     if os.path.isfile(watched_urls_path):
         print("File with all URLs exists... Opening...")
@@ -58,8 +58,10 @@ else:
     complete_file_path = os.path.join(base_path, '../_private_data/WatchedURLs_allDetails.csv')
     df_complete_history_details.to_csv(complete_file_path, index=False, encoding='utf-8')
 
-music_file_path = os.path.join(base_path, '../_private_data/WatchedURLs_MusicVideos.csv')
-watched_music_videos = IdentifyMusicVideo.filter_music_video(df_complete_history_details)
+music_file_path = os.path.join(base_path, 'WatchedURLs_MusicVideos.csv')
+identify_obj = IdentifyMusicVideo(df_complete_history_details)
+watched_music_videos = identify_obj.filter_music_video()
+print(watched_music_videos)
 watched_music_videos.to_csv(music_file_path, index='False', encoding=False)
 
 ###############################################################################

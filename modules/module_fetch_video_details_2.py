@@ -73,6 +73,7 @@ class FetchVideoDetails:
         )
         # Text and Title columns both contain the same thing, so we can drop one.
         df_complete_history_details.drop(columns=["Text"], inplace=True)
+        
         return df_complete_history_details
 
 ###############################################################################

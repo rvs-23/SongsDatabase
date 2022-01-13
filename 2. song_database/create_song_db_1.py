@@ -1,13 +1,13 @@
 r'''
 
 Steps:
-    - First we extract the URL, Text(title), Date(only for json) and VideoID from
-    the history file and create a csv
+    - First we extract the URL, Text(title), Date(only for json) and VideoID from the history file and create a csv.
     - If this file already exists, we open it.
-    - For all the VideoIds, we fetch the necessary details and add it to the dataframe.
-    - If this file already exists, we open it
-
-
+    - For all the VideoIDs present, we fetch the details and add it to the dataframe.
+    - If this file already exists, we open it.
+    - Figure out the duration of our Watched History.
+    - Pass the dataframe to the filter_music_video pass through the first layer of music identification filter.
+    - Create a csv of the database.
 '''
 
 import os
@@ -26,7 +26,7 @@ from module_identify_music_video_3 import IdentifyMusicVideo
 
 ####################################
 
-# Opening HTML/JSON file and the API-key file.
+# 1. Opening HTML/JSON file and the API-key file.
 
 history_file_path = os.path.join(base_path, '../_private_data/watch-history.json')
 api_key_path = os.path.join(base_path, '../_private_data/api_key.txt')
@@ -46,7 +46,7 @@ def open_files(history_file_path, api_key_path, is_json=True):
 
 #######################################
 
-# Creating/Opening csv file that contains all details of our YT history.
+# 2. Creating/Opening csv file that contains all details of our YT history.
 
 complete_history_details_path = os.path.join(base_path, '../_private_data/WatchedURLs_allDetails.csv')
 # We check if file with all details already exists. If not, we create it
@@ -76,6 +76,7 @@ else:
     df_history_details.to_csv(complete_history_details_path, index=False, encoding='utf-8')
     print("File with all details created...")
     
+# Figuring out the duration of our history.
 if 'WatchDate' in df_history_details.columns:
     df_history_details['WatchDate'] = pd.to_datetime(df_history_details['WatchDate'])
     min_date = df_history_details['WatchDate'].min().date()
@@ -93,3 +94,15 @@ watched_music_videos.to_csv(music_database_path, index=False, encoding='utf-8')
 print("Done!")
 
 ##########################################
+
+# Fetching all details of your watched videos...
+# Need csv with watched history URLs...
+# File containing history URLs exists... Opening...
+# Fetching details using the API...
+# File with all details created...
+# The history file contains data from dates(yy-mm-dd) 21-08-03 to 22-01-09.
+# Number of days: 159.
+# Number of months (approx): 5.
+
+# Building an initial database...
+# Done!

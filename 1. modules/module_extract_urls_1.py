@@ -1,10 +1,10 @@
 """
 This is the first module of the project which performs the following tasks:
-    1. We need the history file that can be downloaded from Google takeouts.We can have
-    the history in either an HTML or a JSON file format.
+    1. Watch History File: We need the history file that can be downloaded from Google takeouts.
+    We can download our history in either an HTML or a JSON file format.
         (a) For HTML, we do the following:
             - Remove the HEAD tag from the file.
-            - Extract all the links present and the texts associated with the links
+            - Extract all the links present and the texts associated with the links.
             - Remove the links which are from myactivity.google
             - Remove any videos that have 'short' in their title.
             - For all the YouTube links, extract the VideoID.
@@ -24,14 +24,14 @@ from bs4 import BeautifulSoup
 class ParseYtHistory:
     """
     Class to parse out the necessary information from the HTML/JSON history file.
+    
     NOTE: HTML file takes a lot more time that of the JSON file equivalent.
-
     To parse out aound 30000 links, it took 45 mins in case of HTML whereas it took only
     1 min in case of JSON.
     """
     def __init__(self, history_file, json_file=True):
         """
-        param history_file -> The HTML file containing our YouTube history.
+        param history_file -> The HTML file containing our YouTube history(HTML/JSON).
         param json_file -> True if you are passing a JSON file, False if passing an HTML.
         """
         self.history_file = history_file

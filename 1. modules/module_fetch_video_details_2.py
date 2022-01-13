@@ -1,9 +1,9 @@
 r"""
 This is the second module of the project which performs the following tasks:
-    - For a given video ID, fetch the required details mentioned below.
-    - Create a dataframe of the details corresponding to a VideoID.
+    - For a given video ID, fetches the details mentioned below.
+    - Create a dataframe of the details associated to a VideoID.
 
-Reqd details:
+Reqd. details:
     -VideoID
     -Title
     -CategoryID
@@ -23,8 +23,8 @@ from datetime import timedelta
 
 class FetchVideoDetails:
     """
-    Class to fetch the necessary infromation of all VideoID and create
-    a dataframe containing the required details.
+    Class to fetch the necessary infromation of all VideoIDs and create
+    a dataframe of the required details.
     """
 
     def __init__(self, YT_build, df_video_history):
@@ -81,7 +81,9 @@ class FetchVideoDetails:
     def fetch_duration_sec(x):
         '''
         The Duration returned by YouTube is of the format: 1H2M31S
-        This function calculates the total duration of the video in seconds.
+        
+        This function uses regex to parse out the hours, minutes and seconds
+        to calculate the total duration of the video in seconds.
         '''
         # Match the pattern to extract hours, minutes and seconds.
         hrs_pattern = re.compile(r'(\d+)H')

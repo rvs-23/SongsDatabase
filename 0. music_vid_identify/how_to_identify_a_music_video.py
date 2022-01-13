@@ -1,14 +1,14 @@
 r'''
 
-Once we have obtained a list of videos alongwith all the necessary details, how
-do we identify if a particular video is a MUSIC video?
+Once we have obtained a list of videos alongwith all the necessary details from 
+our history, how do we identify if a particular video is a MUSIC video?
 
-Idea: we could use a combination of CategoryID and Video Tags.
+Idea: we could use a combination of CategoryID, Video Tags and Description words.
 Problem: How do we know which values to pick?
 
 Solution:
     This script experiments with a playlist of ONLY MUSIC videos to figure out
-    the most common Video Tags used and CategoryID assigned for music videos.
+    the most common CategoryID, Video Tags and Description assigned for music videos.
 
     Playlist used: https://www.youtube.com/watch?v=JGwWNGJdvx8&list=PLhsz9CILh357zA1yMT-K5T9ZTNEU6Fl6n
 
@@ -95,17 +95,16 @@ while True:
     if not nextPageToken:
         break
 
-
 df = pd.DataFrame(all_video_details)
 
 ######################################
 
-# 1. Filtering CategoryID
+# 1. Filtering most used CategoryID
 # Filtering the top 2 CategoryIDs which YT identifies as music.
 top_categories = df['CategoryID'].value_counts()[:2]
 print(f"Fetched top-2 categories that account for {round(sum(top_categories)/len(df)*100, 2)} % music videos...")
 
-# 2. Filtering Tags
+# 2. Filtering most used Tags
 # The tags column contains a list of tags associated with each video.
 # Creating a single list of all the tags associated with the videos.
 all_tags = [
@@ -115,7 +114,7 @@ all_tags = [
 top_tags = Counter(all_tags).most_common(750)
 print(f"Fetched {len(top_tags)} most common tags...")
 
-# 3. Filtering Description
+# 3. Filtering most used Description words
 desc_words = ''.join(df['Description'].str.lower()).split()
 # From these words, we need to remove the stop words.
 stopwords_en = stopwords.words('english')

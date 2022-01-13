@@ -1,15 +1,18 @@
 r'''
-This is the third module of the project that accepts the dataframe of watch
-history(containing VideoID, Title, Tags, categoryID, Description) and tries to figure out 
+This is the third module of the project that uses the dataframe of watch history
+(containing VideoID, Title, Tags, categoryID, Description) and tries to figure out 
 if a video could be a music video:
     Layer 1: Using CategoryID:
-        - Youtube identifies a music video by assigning a video Category 10. Although, this may not be 100% accurate.
+        - As understood from our experiment, Youtube identifies a music video by assigning a video Category 10.
+        Although, this may not be 100% accurate. Refer the following link:
             https://stackoverflow.com/questions/17698040/youtube-api-v3-where-can-i-find-a-list-of-each-videocategoryid
     
     Layer 2: Using Tags and Description:
-        - This playlist contains about 5000 of the most played songs on YouTube. We can use this to screen the most
-        popular tags and description words to identify if it could be a music video.
+        - This playlist contains about 5000 of the most played songs on YouTube.
             https://www.youtube.com/watch?v=JGwWNGJdvx8&list=PLhsz9CILh357zA1yMT-K5T9ZTNEU6Fl6n
+        In our experiments script, we screened the most popular tags and most commonly used
+        description words in a music video. We can use those to add another layer to our
+        music video identification system.
 '''
 
 import os
@@ -22,8 +25,8 @@ pd.options.mode.chained_assignment = None
 
 class IdentifyMusicVideo:
     '''
-    Class that attempts to identify a music video using the title, categoryID,
-    tags and Description.
+    Class that attempts to identify a music video using the categoryID,
+    Tags and Description.
     '''
     
     base_path = os.path.dirname(__file__)
@@ -38,11 +41,10 @@ class IdentifyMusicVideo:
         self.tags_file = os.path.join(self.base_path, '../0. music_vid_identify/music_identify_data/top_tags.pkl')
         self.desc_words_file = os.path.join(self.base_path, '../0. music_vid_identify/music_identify_data/top_desc_words.pkl')
         
-        
     def get_cat_tag_desc(self):
         '''
         Function to open the pickle file containing the most popular CategoryID,
-        tags and description words. 
+        Tags and Description words. 
         
         Returns a list of each.
         '''
@@ -66,10 +68,10 @@ class IdentifyMusicVideo:
     
     def filter_by_category(self, category_ids):
         '''
-        Filter the dataframe by the top 3 music categories.
+        Filter the dataframe by the top 2 music categories.
         
         Function creates a column called CategoryCheck which is 1 if the category
-        belongs to our top-3, 0 otherwise.
+        belongs the identified Top-2 from the experiments, 0 otherwise.
         '''
         category_ids = list(map(int, category_ids))
         
@@ -79,41 +81,40 @@ class IdentifyMusicVideo:
     
     def filter_by_tags(self, tags):
         '''
-        Filter the dataframe by the top 0.5% most popular tags used in the playlist.
+        Filter the dataframe by the 500 most popular tags used in the playlist.
         
-        Function creates a column called TagsCheck which is 1 if the tags belong
-        to the top 0.5%, 0 otherwise.
+        Function creates a column called TagsCheck which is 1 if the tag belongs
+        to the top 500, 0 otherwise.
         '''
+        # Replacing nan/None tags (if any) with an empty string
+        self.df_history_details['Tags'].fillna(' ', inplace=True)
         
-        self.df_history_details['Tags'] = self.df_history_details['Tags'].str.lower()
-        self.df_history_details['Tags'] = self.df_history_details['Tags'].apply(
-            lambda x: x if pd.notna(x) else ['empty_tag']
-            )
+        # Setting TagsCheck=1, if tags belong to the top-500
         self.df_history_details['TagsCheck'] = self.df_history_details['Tags'].apply(
             lambda x: 1 if [common_tag for common_tag in x if common_tag in tags] else 0
             )
         
     def filter_by_description(self, desc_words):
         '''
-        Filter the dataframe by the top 0.5% most popular words used in the description.
+        Filter the dataframe by the 250 most popular words used in description of
+        music videos.
         
         Function creates a column called DescriptionCheck which is 1 if the Description
-        contains words that belong to the top 0.5%, 0 otherwise.
+        contains words that belong to the top 500, 0 otherwise.
         '''
         stopwords_en = stopwords.words('english')
         
         # self.df_history_details['AllDescWords'] = self.df_history_details.apply(lambda x: desc_words, axis=1)
-        
-        # If Description is empty, add a string else convert it to lower case
+        # If Description is empty, add a blank string, else convert it to lower case.
         self.df_history_details['DescExists'] = self.df_history_details['Description'].apply(
-            lambda x: x.lower() if pd.notna(x) else 'empty_desc'
+            lambda x: x.lower() if pd.notna(x) else ' '
             )
         
         # Split the description into a list of words and remove the stopwords.
         self.df_history_details['Description'] = self.df_history_details['DescExists'].apply(
             lambda x: [word for word in x.split() if word not in stopwords_en]
             )
-        
+        # DescriptionCheck column = 1 if description has words that belong to top-250
         self.df_history_details['DescriptionCheck'] = self.df_history_details['Description'].apply(
             lambda x: 1 if [cw for cw in x if cw in desc_words] else 0
             )
@@ -124,20 +125,22 @@ class IdentifyMusicVideo:
         it's almost certainly not a Music Video.
         
         This function filters such videos and returns a dataframe only with necessary
-        details like 'VideoID', 'Title', 'CategoryID', 'Description', 'Tags', 'CategoryCheck',
-        'TagsCheck' and 'DescriptionCheck'.
+        details which are: 
+            'VideoID', 'Title', 'CategoryID', 'Description',
+            'Tags', 'CategoryCheck', 'AllDescWordsTagsCheck',
+            'DescriptionCheck'.
         '''
 
         # Removing YouTube shorts(videos with duration 60s or less)
         self.df_history_details = self.df_history_details.loc[self.df_history_details['Duration']>60]
         
-        # Creating checks for tags, category and description.
+        # Creating checks for tags, category and description words.
         top_ids, top_tags, top_desc_words = self.get_cat_tag_desc()
         self.filter_by_category(top_ids)
         self.filter_by_tags(top_tags)
         self.filter_by_description(top_desc_words)
         
-        # Ignoring all videos that don't pass any checks.
+        # Ignoring all videos that don't pass any of the checks.
         df_filtered_music = self.df_history_details[~(
             (self.df_history_details['CategoryCheck'] == 0)
             & (self.df_history_details['TagsCheck'] == 0)

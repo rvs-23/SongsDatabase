@@ -1,3 +1,9 @@
+r'''
+This module does the following:
+    - Creates a text file of all the words used in the title, tags and description.
+    - Creates 10 wordcloud images from the text file and combines them to form a GIF.
+'''
+
 import os
 import glob
 import string
@@ -9,17 +15,50 @@ from collections import Counter
 from wordcloud import WordCloud, STOPWORDS
 
 class CreateWordCloud:
+    '''
+    
+    '''
     
     def __init__(self, df_music, ignore_words=None):
+        '''
+        param df_music -> DataFrame of the final music database
+        param ignore_words -> Words that we choose to ignore from our wordclouds.
+        '''
         self.df_music = df_music
         self.ignore_words = ignore_words
         if self.ignore_words is None:
             self.ignore_words = [
-                'facebook', 'twitter', 'instagram', 'amzn', 'tiktok', 'https', 'bit', 'ly', 'smarturl', 'new', 'generated', 'sms', 'im', 'sax', 'tik', 'tok'
+                'facebook',
+                'twitter',
+                'instagram',
+                'amzn',
+                'tiktok',
+                'https',
+                'bit',
+                'ly',
+                'smarturl',
+                'new',
+                'generated',
+                'sms',
+                'im',
+                'sax',
+                'tik',
+                'tok',
+                'unknown'
                 ]
-        
+    
+
     @staticmethod
     def remove_punct(wstr):
+        '''
+        param wstr -> string containing all the texts that we extracted from the
+        music databse.
+        
+        Function removes punctuation and some special characters and replaces them
+        with a blank space.
+        
+        returns updated string with no punctuations and some special characters.
+        '''
         nwstr = ''
         for char in wstr:
             if (char not in string.punctuation) and (char not in ('|', '(', ')', '-', ':', '[', ']')):
@@ -28,28 +67,42 @@ class CreateWordCloud:
                 nwstr += ' '
         return nwstr
     
+    
     def get_words_string(self, create_text_file=True):
+        '''
+        param create_text_file -> Set to True(default), if we want to save the words
+        we will be using in a text file.
         
+        Combines the Title, Tags and description to create a text file of all 
+        the words present in our database.
+        '''
+        
+        # Check if the file already exists. If not, extract words 
         if os.path.isfile('AllWordsMusicDatabase.txt'):
             with open('AllWordsMusicDatabase.txt', 'r', encoding='utf-8') as file:
                 words_string_clean = file.read()
-
         else:
+            
+            # Creating a continuous string of all the Titles.
             all_titles = list(self.df_music['Title'])
             all_titles_str = ' '.join(all_titles)
             
+            # Since tags are a list of strings, we perform the following sequence
+            # to create a continuous string of all the Tags used.
             all_tags = list(self.df_music['Tags'].str.strip('[]').str.split(','))
             all_tags = [tag for tag_list in all_tags for tag in tag_list]
             all_tags_str = ' '.join(all_tags)
             all_tags_str = all_tags_str.replace("'", '')
             
+            # We perform a similar operation as above for the description.
             all_desc = list(self.df_music['Description'].str.strip('[]').str.split(','))
             all_desc = [desc for desc_list in all_desc for desc in desc_list]
             all_desc_str = ' '.join(all_desc)
             all_desc_str = all_desc_str.replace("'", '')
             all_desc_str = all_desc_str.replace("#", '')
             
-            words_string = all_titles_str + ' ' + all_tags_str #+ ' ' + all_desc_str
+            # Join the titles, tags and description to form one single string.
+            words_string = all_titles_str + ' ' + all_tags_str + ' ' + all_desc_str
             words_string_clean = CreateWordCloud.remove_punct(words_string)
             words_string_clean = ' '.join([
                 words.lower() for words in words_string_clean.split() if words.lower() not in self.ignore_words
@@ -62,14 +115,19 @@ class CreateWordCloud:
         return words_string_clean
         
     def generateWC(self, part=999):
+        '''
+        param part -> Specifies the name of the Final WordCloud image.
+        
+        Function generates a random cloud using all the words stored from
+        title, tag and description.
+        '''
         words_clean = self.get_words_string()
-        plt.figure(figsize=(12, 9))
+        plt.figure(figsize=(9, 9))
         wc = WordCloud(
-            width=600,
-            height=700,
+            width=1000,
+            height=1100,
             margin=0,
             mask=None,
-            scale=1,
             max_words=200,
             min_font_size=5,
             stopwords=STOPWORDS,
@@ -82,16 +140,25 @@ class CreateWordCloud:
             colormap='ocean',
             contour_width=0,
             contour_color='black',
-            min_word_length=3
+            min_word_length=4
         )
         wc.generate(words_clean)
         plt.imshow(wc, interpolation='bilinear')
         plt.axis('off')
         plt.savefig(f'photos/WordCloud_{part}.png')
-        plt.show()
+        
         
     def randomWcs(self):
+        '''
+        To build the animation, we have adopted the following strategy:
+            - We build 10 random wordclouds using words in such a way,
+            that the least frequent mords appear first, and so on.
+            - We, them combine the images to form a gif.
+            
+        This function generates 10 random wordclouds using our text file.
+        '''
         words_clean = self.get_words_string()
+        self.generateWC(part=0)
         
         words_count = Counter(words_clean.split()).most_common(350)
         words_clean_ord = ''
@@ -100,10 +167,10 @@ class CreateWordCloud:
     
         wc_count = 10
         for part in range(1, wc_count):
-            plt.figure(figsize=(12, 9))
+            plt.figure(figsize=(9, 9))
             wc = WordCloud(
-                width=600,
-                height=700,
+                width=1000,
+                height=1100,
                 margin=0,
                 mask=None,
                 scale=1,
@@ -132,14 +199,23 @@ class CreateWordCloud:
         self.generateWC(part+1)
             
     def animateWC(self):
+        '''
+        Function that completes the animation.
+        Saves the final gif into the same directory as the file.
+        '''
         self.randomWcs()
         images = list(glob.glob('photos/*.png'))
         list.sort(images, key=lambda x: int(x.split('\\')[1].split('.png')[0].split('_')[-1]))
         image_list = []
         for image_name in images:
             image_list.append(imageio.imread(image_name))
-            
-        imageio.mimwrite('FinalWordCloud_Anim.gif', image_list, loop=2, fps=120, duration=0.35)
+        
+        # Use the following if there are many images:
+        # with imageio.get_writer('test.gif', mode='I') as writer:
+        #     for filename in images:
+        #         image = imageio.imread(filename)
+        #         writer.append_data(image)
+        imageio.mimwrite('FinalWordCloud_Anim_medium.gif', image_list, loop=2, fps=120, duration=0.35)
 
 ############################
 

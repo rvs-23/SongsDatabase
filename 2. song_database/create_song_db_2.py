@@ -58,8 +58,7 @@ manual_check_db.reset_index(inplace=True, drop=True)
 print(f"{len(manual_check_db)} videos must be manually checked if you want a thorough list :(")
 
 print("Creating an excel file of videos to be manually checked...")
-# We add a column with a default value of No, which can be manually toggled by the
-# user to Y.
+# We add a column with a default value of No, which can be manually toggled by the user to Y.
 manual_check_db['Is_Music_Manual'] = pd.Series(['N']*len(manual_check_db), dtype='str')
 manual_check_db.to_excel(
     os.path.join(base_path, 'songs_heard/ManuallyCheckMusic.xlsx'), index=False, encoding='utf-8'

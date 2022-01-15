@@ -26,7 +26,7 @@ import pickle
 from nltk.corpus import stopwords
 from googleapiclient.discovery import build
 
-# If you have never downloaded list of stopwords, uncomment the following lines:
+# If you have never downloaded list of stopwords before, uncomment the following lines:
 # import nltk
 # nltk.download('stopwords')
 
@@ -49,8 +49,8 @@ all_video_details = []
 playlist_id = 'PLhsz9CILh357zA1yMT-K5T9ZTNEU6Fl6n'
 # What's the idea, here?
 # We loop through each page of the playlist, fetch the video ID of all present
-# videos, fetch the details of those videos and append that to a list. Repeat
-# the process, until the playlist is exhausted.
+# videos, fetch the details of those videos and append them to a list. Repeat
+# the process, until the playlist pages are exhausted.
 while True:
     # YouTube resource to fetch playlist video IDs.
     pl_req = yt.playlistItems().list(
@@ -66,7 +66,8 @@ while True:
     for item in pl_response['items']:
         video_ids.append(item['contentDetails'].get('videoId'))
 
-    # YouTube resource to fetch details of the obtained 50 videos
+    # YouTube resource to fetch details of the obtained 50 videos.
+    # snippet contains Title, Tags, Description and CategoryID.
     vid_req = yt.videos().list(
         part='snippet',
         id=','.join(video_ids)

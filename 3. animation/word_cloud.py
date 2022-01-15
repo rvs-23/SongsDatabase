@@ -16,7 +16,7 @@ from wordcloud import WordCloud, STOPWORDS
 
 class CreateWordCloud:
     '''
-    
+    Class to create the wordcloud animation.
     '''
     
     def __init__(self, df_music, ignore_words=None):
@@ -44,7 +44,14 @@ class CreateWordCloud:
                 'sax',
                 'tik',
                 'tok',
-                'unknown'
+                'unknown',
+                'provided',
+                'want',
+                'associated',
+                'apple',
+                'engineer',
+                'make',
+                'produced'
                 ]
     
 
@@ -101,7 +108,8 @@ class CreateWordCloud:
             all_desc_str = all_desc_str.replace("'", '')
             all_desc_str = all_desc_str.replace("#", '')
             
-            # Join the titles, tags and description to form one single string.
+            # Join the titles, tags and description to form one single string and
+            # remove unnecessary punctuation.
             words_string = all_titles_str + ' ' + all_tags_str + ' ' + all_desc_str
             words_string_clean = CreateWordCloud.remove_punct(words_string)
             words_string_clean = ' '.join([
@@ -116,7 +124,7 @@ class CreateWordCloud:
         
     def generateWC(self, part=999):
         '''
-        param part -> Specifies the name of the Final WordCloud image.
+        param part -> Used to specify the name of the Final WordCloud image.
         
         Function generates a random cloud using all the words stored from
         title, tag and description.
@@ -128,16 +136,16 @@ class CreateWordCloud:
             height=1100,
             margin=0,
             mask=None,
-            max_words=200,
+            max_words=190,
             min_font_size=5,
             stopwords=STOPWORDS,
             random_state=23,
-            background_color='white',
+            background_color='black',
             max_font_size=None,
             font_step=1,
             mode='RGB',
             collocations=True,
-            colormap='ocean',
+            colormap='Spectral',
             contour_width=0,
             contour_color='black',
             min_word_length=4
@@ -160,6 +168,11 @@ class CreateWordCloud:
         words_clean = self.get_words_string()
         self.generateWC(part=0)
         
+        # Find the top 350 words from out text file.
+        # Create a new string which has words listed in increasing
+        # order of their frequency.
+        # This is necessary so that we can show how new words are added
+        # to our word cloud animation.
         words_count = Counter(words_clean.split()).most_common(350)
         words_clean_ord = ''
         for word in words_count:
@@ -174,20 +187,24 @@ class CreateWordCloud:
                 margin=0,
                 mask=None,
                 scale=1,
-                max_words=250,
+                max_words=200,
                 min_font_size=5,
                 stopwords=STOPWORDS,
                 random_state=15,
-                background_color='white',
+                background_color='black',
                 max_font_size=None,
                 font_step=1,
                 mode='RGB',
                 collocations=True,
-                colormap='ocean',
+                colormap='Spectral',
                 contour_width=0,
                 contour_color='black',
                 min_word_length=3
             )
+            # We divide the whole text file into 10 parts, and for each iteration 
+            # choose a tenth of the file to add to our wordcloud.
+            # The tenth is randomly shuffled so that the wordcloud looks 
+            # more realistic.
             least_to_most_freq_words = words_clean_ord[:(part*len(words_clean_ord)//10) + 1].split()
             random.shuffle(least_to_most_freq_words)
             least_to_most_freq_words_random = ' '.join(least_to_most_freq_words)
@@ -196,6 +213,7 @@ class CreateWordCloud:
             plt.axis('off')
             plt.savefig(f'photos/WordCloud_{part}.png')
             
+        # Adding our final animation with the whole picture.
         self.generateWC(part+1)
             
     def animateWC(self):
@@ -204,7 +222,11 @@ class CreateWordCloud:
         Saves the final gif into the same directory as the file.
         '''
         self.randomWcs()
+        
+        # Choosing all the wordcloud images.
         images = list(glob.glob('photos/*.png'))
+        # Sorting according to the numbers added to the names, so that the wordcloud
+        # appears in order.
         list.sort(images, key=lambda x: int(x.split('\\')[1].split('.png')[0].split('_')[-1]))
         image_list = []
         for image_name in images:

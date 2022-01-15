@@ -1,15 +1,16 @@
 """
+First, we need the watch history file. It can be downloaded from Google Takeout in 
+either an HTML or JSON format.
 This is the first module of the project which performs the following tasks:
-    1. Watch History File: We need the history file that can be downloaded from Google takeouts.
-    We can download our history in either an HTML or a JSON file format.
-        (a) For HTML, we do the following:
+    1.
+        (a) For HTML history file:
             - Remove the HEAD tag from the file.
             - Extract all the links present and the texts associated with the links.
             - Remove the links which are from myactivity.google
             - Remove any videos that have 'short' in their title.
             - For all the YouTube links, extract the VideoID.
         
-        (b) For JSON, we do the following:
+        (b) For JSON history file:
             - Extract all the links present and the texts associated with the links.
             - Remove any videos that have 'short' in their title.
             - For all the YouTube links, extract the VideoID.

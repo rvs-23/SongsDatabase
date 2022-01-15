@@ -1,7 +1,8 @@
 r'''
 This is the third module of the project that uses the dataframe of watch history
 (containing VideoID, Title, Tags, categoryID, Description) and tries to figure out 
-if a video could be a music video:
+if a video is a music video:
+    
     Layer 1: Using CategoryID:
         - As understood from our experiment, Youtube identifies a music video by assigning a video Category 10.
         Although, this may not be 100% accurate. Refer the following link:
@@ -81,15 +82,15 @@ class IdentifyMusicVideo:
     
     def filter_by_tags(self, tags):
         '''
-        Filter the dataframe by the 500 most popular tags used in the playlist.
+        Filter the dataframe by the 750 most popular tags used in the playlist.
         
         Function creates a column called TagsCheck which is 1 if the tag belongs
-        to the top 500, 0 otherwise.
+        to the top 750, 0 otherwise.
         '''
         # Replacing nan/None tags (if any) with an empty string
         self.df_history_details['Tags'].fillna(' ', inplace=True)
         
-        # Setting TagsCheck=1, if tags belong to the top-500
+        # Setting TagsCheck=1, if tags belong to the top-750
         self.df_history_details['TagsCheck'] = self.df_history_details['Tags'].apply(
             lambda x: 1 if [common_tag for common_tag in x if common_tag in tags] else 0
             )

@@ -3,7 +3,7 @@ This is the second module of the project which performs the following tasks:
     - For a given video ID, fetches the details mentioned below.
     - Create a dataframe of the details associated to a VideoID.
 
-Reqd. details:
+Details that are fetched:
     -VideoID
     -Title
     -CategoryID

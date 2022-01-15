@@ -3,10 +3,10 @@ r'''
 Steps:
     - First we extract the URL, Text(title), Date(only for json) and VideoID from the history file and create a csv.
     - If this file already exists, we open it.
-    - For all the VideoIDs present, we fetch the details and add it to the dataframe.
+    - For all the VideoIDs present, we fetch the details and add it to a dataframe.
     - If this file already exists, we open it.
-    - Figure out the duration of our Watched History.
-    - Pass the dataframe to the filter_music_video pass through the first layer of music identification filter.
+    - Figure out the period of our Watched History.
+    - Pass the dataframe that we created earlier through the first layer of music identification filter.
     - Create a csv of the database.
 '''
 

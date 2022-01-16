@@ -130,22 +130,23 @@ class CreateWordCloud:
         title, tag and description.
         '''
         words_clean = self.get_words_string()
-        plt.figure(figsize=(9, 9))
+        fig = plt.figure(figsize=(9,9))
+        fig.patch.set_facecolor('white')
         wc = WordCloud(
-            width=1000,
-            height=1100,
+            width=1100,
+            height=1300,
             margin=0,
             mask=None,
             max_words=190,
             min_font_size=5,
             stopwords=STOPWORDS,
             random_state=23,
-            background_color='black',
+            background_color='white',
             max_font_size=None,
             font_step=1,
             mode='RGB',
             collocations=True,
-            colormap='Spectral',
+            colormap='ocean',
             contour_width=0,
             contour_color='black',
             min_word_length=4
@@ -178,12 +179,15 @@ class CreateWordCloud:
         for word in words_count:
             words_clean_ord = (word[0]+' ')*int(word[1]) + words_clean_ord
     
-        wc_count = 10
+        wc_count = 5
         for part in range(1, wc_count):
-            plt.figure(figsize=(9, 9))
+            # plt.figure(figsize=(9, 9))
+            
+            fig = plt.figure(figsize=(9,9))
+            fig.patch.set_facecolor('white')
             wc = WordCloud(
-                width=1000,
-                height=1100,
+                width=1100,
+                height=1300,
                 margin=0,
                 mask=None,
                 scale=1,
@@ -191,12 +195,12 @@ class CreateWordCloud:
                 min_font_size=5,
                 stopwords=STOPWORDS,
                 random_state=15,
-                background_color='black',
+                background_color='white',
                 max_font_size=None,
                 font_step=1,
                 mode='RGB',
                 collocations=True,
-                colormap='Spectral',
+                colormap='ocean',
                 contour_width=0,
                 contour_color='black',
                 min_word_length=3
@@ -237,7 +241,7 @@ class CreateWordCloud:
         #     for filename in images:
         #         image = imageio.imread(filename)
         #         writer.append_data(image)
-        imageio.mimwrite('FinalWordCloud_Anim_medium.gif', image_list, loop=2, fps=120, duration=0.35)
+        imageio.mimwrite('FinalWordCloud_Anim_medium.gif', image_list, loop=2, fps=120, duration=0.3)
 
 ############################
 

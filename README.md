@@ -14,21 +14,17 @@ Contains a script called: how_to_identify_a_music_video.py which identifies the 
 ## 1. modules
 
 Contains three modules:-
-<li>
-  <ol>module_extract_urls_1.py : Extracts all the videos from the history file.</ol>
-  <ol>module_fetch_video_details_2.py: Fetches the details of all the videos extracted. Details include - Title, Description, Tags, Duration.</ol>
-  <ol>module_identify_music_video_3.py: Implements a system of classifying a video as music or not music.</ol>
-</li>
-
+  - module_extract_urls_1.py : Extracts all the videos from the history file.</ol>
+  - module_fetch_video_details_2.py: Fetches the details of all the videos extracted. Details include - Title, Description, Tags, Duration.</ol>
+  - module_identify_music_video_3.py: Implements a system of classifying a video as music or not music.</ol>
 
 
 ## 2. song_database
 
 Contains two scripts:
-<li>
-  <ol>create_song_db_1.py : Uses the above modules in sequence to create an initial database of possible music videos.</ol>
-  <ol>create_song_db_2.py : Filters the initial database into three categories - Y(definitely music), N(definitely not music), Maybe(requires manually check).</ol>
-</li>
+  - create_song_db_1.py : Uses the above modules in sequence to create an initial database of possible music videos.</ol>
+  - create_song_db_2.py : Filters the initial database into three categories - Y(definitely music), N(definitely not music), Maybe(requires manually check).</ol>
+  - 
 
 ## 3. animation
 
